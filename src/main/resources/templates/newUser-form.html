@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head xmlns:th="http://www.thymeleaf.org">
     <meta charset="UTF-8">
-    <title>Formularz</title>
+    <title>New user form</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/field-list-style.css">
@@ -73,7 +73,14 @@
         </tr>
     </table>
     <button class="btn btn-primary" type="submit">Save</button>
-    <div><a href="/">Cancel</a></div>
+
+    <div sec:authorize="hasRole('ADMIN')">
+        <a href="/admin">Cancel</a>
+    </div>
+
+    <div sec:authorize="hasRole('ANONYMOUS')">
+        <a href="/">Cancel</a>
+    </div>
 </form>
 </div>
 </body>

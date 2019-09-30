@@ -49,14 +49,15 @@ public class UserController {
     }
 
     @PostMapping(value = "/signUp")
-    public String processForm(@Valid @ModelAttribute("user") User user,
+    public String processForm(@AuthenticationPrincipal LoggedUserDetails adminDetails,
+                              @Valid @ModelAttribute("user") User user,
                               BindingResult result, HttpServletResponse response) {
         if (result.hasErrors()) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return "newUser-form";
         } else {
             userService.add(user);
-            return "redirect:/";
+            return adminDetails == null ? "redirect:/" : "redirect:/admin";
         }
     }
 
@@ -70,10 +71,10 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
-    public ModelAndView adminPage(){
+    public ModelAndView adminPage() {
         List<User> userList = userService.findAllUsers();
         ModelAndView modelAndView = new ModelAndView("adminPage.html");
-        modelAndView.addObject("users",userList);
+        modelAndView.addObject("users", userList);
         return modelAndView;
     }
 
