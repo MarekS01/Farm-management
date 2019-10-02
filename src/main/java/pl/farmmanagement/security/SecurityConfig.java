@@ -24,7 +24,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SecurityUserDetailsService userDetailsService;
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     private  AuthenticationSuccessHandler authenticationSuccessHandler;
 
