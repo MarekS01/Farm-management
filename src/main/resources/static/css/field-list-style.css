@@ -1,10 +1,11 @@
-h2, h6, tr,td{
+h1,h2, h6, tr,td{
     text-align: center;
     vertical-align: center;
 }
 
 .error{
     color: red;
+    text-align: center;
 }
 
 .textColumn{
@@ -12,9 +13,33 @@ h2, h6, tr,td{
     max-height: 30px;
     overflow-wrap: break-word;
 }
-.image{
+.profileImage{
     width: 60px;
     height: 60px;
+}
+
+.updateImage{
+    width: 20px;
+    height: 20px;
+    text-align: initial
+}
+
+.userDetails{
+    margin-top: 15px;
+    vertical-align: middle;
+    font-size: 20px;
+}
+
+.label{
+    text-align: right;
+}
+
+.field{
+    text-align: left;
+}
+
+#givenNameUpdate, #surnameUpdate, #emailUpdate{
+    display: none;
 }
 
 #container{
@@ -26,9 +51,6 @@ h2, h6, tr,td{
 
 #searchingFields{
     float: right;
-}
-
-#firstName, #lastName, #email{
 }
 
 #logMessage{
