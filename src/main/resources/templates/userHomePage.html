@@ -10,9 +10,12 @@
 
 <body>
 <div id="container">
-    User: <span sec:authentication="name"></span>
-
-    <form th:action="@{/logout}" method="post" id="backOption">
+    <div>
+        User: <span sec:authentication="name"></span>
+        <img class="profileImage" id="image" th:src="@{image/profile.png}" align="right"
+             onclick="window.location.href='/userUpdate'" onmouseenter="profileImageFunction()">
+    </div>
+    <form th:action="@{/logout}" method="post">
         <input type="submit" value="Sign Out">
     </form>
 
@@ -23,7 +26,7 @@
                onclick="window.location.href='/user/newField'; return false;"
                class="add-button"
         />
-        <input type="text" id="searchingFields" onkeyup="myFunction()"
+        <input type="text" id="searchingFields" onkeyup="searchingFunction()"
                placeholder="Search for field name.." title="Type in a field name">
     </div>
 
@@ -41,25 +44,24 @@
         <tr th:each="tempField : ${fields}">
             <td th:text="${tempField.getName()}"/>
             <td th:text="${tempField.getArea()}"/>
-                        <td>
-                            <a th:href="@{/user/operations(id=${tempField.getId()},fieldName=${tempField.getName()})}">Operations</a>
-                            |
-                            <a th:href="@{/user/updateField(id=${tempField.getId()})}">Update</a>
-                            |
-                            <a th:href="@{/user/delete(id=${tempField.getId()})}"
-                               onclick="if (!(confirm('Are you sure you want to delete this field?'))) return false">
-                                Delete
-                            </a>
+            <td>
+                <a th:href="@{/user/operations(id=${tempField.getId()},fieldName=${tempField.getName()})}">Operations</a>
+                |
+                <a th:href="@{/user/updateField(id=${tempField.getId()})}">Update</a>
+                |
+                <a th:href="@{/user/delete(id=${tempField.getId()})}"
+                   onclick="if (!(confirm('Are you sure you want to delete this field?'))) return false">
+                    Delete
+                </a>
 
-                        </td>
+            </td>
         </tr>
         </tbody>
-        </table>
+    </table>
 
-    </div>
+</div>
 
-
-<script src="/js/fieldSearcher.js"></script>
+<script src="js/function-scripts.js"></script>
 
 </body>
 </html>

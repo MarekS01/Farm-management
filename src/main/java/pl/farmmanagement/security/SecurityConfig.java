@@ -24,7 +24,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SecurityUserDetailsService userDetailsService;
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     private  AuthenticationSuccessHandler authenticationSuccessHandler;
 
@@ -53,10 +52,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/resources/**");
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
