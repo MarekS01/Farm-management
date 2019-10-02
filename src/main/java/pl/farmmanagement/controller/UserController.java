@@ -11,6 +11,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.farmmanagement.model.FieldEntity;
+import pl.farmmanagement.model.UpdateUserDTO;
 import pl.farmmanagement.model.User;
 import pl.farmmanagement.security.LoggedUserDetails;
 import pl.farmmanagement.service.UserService;
@@ -63,10 +64,76 @@ public class UserController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/user")
-    public String userHomePage(Model model, @AuthenticationPrincipal LoggedUserDetails userDetails) {
+    public String userHomePage(Model model, @AuthenticationPrincipal LoggedUserDetails userDetails,
+                               HttpServletRequest request) {
         List<FieldEntity> allUserField = userService.getAllUserFieldById(userDetails.getId());
         model.addAttribute("fields", allUserField);
+        request.getSession().removeAttribute("updateMessage");
         return "userHomePage";
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("userUpdate")
+    public String userCockpit(@AuthenticationPrincipal LoggedUserDetails userDetails, Model model) {
+        UpdateUserDTO theUser = userService.getByUserName(userDetails.getUsername());
+        model.addAttribute("user", theUser);
+        return "userCockpit";
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("userUpdate/givenName")
+    public String updateUserGivenName(@ModelAttribute("user") @Valid UpdateUserDTO user,
+                                    BindingResult bindingResult,
+                                    HttpServletRequest request) {
+        if (bindingResult.hasFieldErrors("givenName")) {
+            request.getSession().setAttribute("updateMessage","Incorrect new first name");
+        } else {
+            request.getSession().setAttribute("updateMessage","The first name was changed successfully");
+            userService.updateUserGivenName(user);
+        }
+            return "redirect:/userUpdate";
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("userUpdate/surname")
+    public String updateUserSurname(@ModelAttribute("user") @Valid UpdateUserDTO user,
+                                    BindingResult bindingResult,
+                                    HttpServletRequest request) {
+        if (bindingResult.hasFieldErrors("surname")) {
+            request.getSession().setAttribute("updateMessage","Incorrect new last name");
+        } else {
+            request.getSession().setAttribute("updateMessage","The last name was changed successfully");
+            userService.updateUserSurname(user);
+        }
+            return "redirect:/userUpdate";
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("userUpdate/email")
+    public String updateEmail(@ModelAttribute("user") @Valid UpdateUserDTO user,
+                                    BindingResult bindingResult,
+                                    HttpServletRequest request) {
+        if (bindingResult.hasFieldErrors("eMail")) {
+            request.getSession().setAttribute("updateMessage","Incorrect new email");
+        } else {
+            request.getSession().setAttribute("updateMessage","The email was changed successfully");
+            userService.updateUserEmail(user);
+        }
+        return "redirect:/userUpdate";
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("userUpdate/password")
+    public String updatePassword(@ModelAttribute("user") @Valid UpdateUserDTO user,
+                              BindingResult bindingResult,
+                              HttpServletRequest request) {
+        if (bindingResult.hasGlobalErrors()) {
+            request.getSession().setAttribute("updateMessage","Password change failed");
+        } else {
+            request.getSession().setAttribute("updateMessage","The password was changed successfully");
+            userService.updateUserPassword(user);
+        }
+        return "redirect:/userUpdate";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -84,4 +151,5 @@ public class UserController {
         userService.delete(id);
         return "redirect:/admin";
     }
+
 }
