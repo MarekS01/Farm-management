@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>User cockpit</title>
+    <link rel="stylesheet" type="text/css" href="/css/field-list-style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div id="container">
+    <h1 sec:authentication="name"></h1>
+    <h4 class="error" th:if="${session.updateMessage}" th:text="${session.updateMessage}"></h4>
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#profile">Profile</a></li>
+        <li><a href="#password">Password</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id="profile">
+
+            <div class="userDetails">
+                <form  th:action="@{/userUpdate/givenName}" th:object="${user}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <label th:for="givenName">First name: <span th:text="*{givenName}"></span></label>
+                    <img id="givenNameUpdateImage" class="updateImage" th:src="@{image/update.png}"
+                         onmouseenter="updateImageFunction()">
+                    <div id="givenNameUpdate">
+                        <input type="text" th:id="givenName" th:field="*{givenName}">
+                        <p th:if="${#fields.hasErrors('givenName')}"
+                           th:errors="*{givenName}"
+                           class="error">First name error</p>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="userDetails">
+                <form th:object="${user}" th:action="@{/userUpdate/surname}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <label th:for="surname">Last name: <span th:text="*{surname}"></span></label>
+                    <img id="surnameUpdateImage" class="updateImage" th:src="@{image/update.png}"
+                         onmouseenter="updateImageFunction()">
+                    <div id="surnameUpdate">
+                        <input type="text" th:id="surname" th:field="*{surname}">
+                        <p th:if="${#fields.hasErrors('surname')}"
+                           th:errors="*{surname}"
+                           class="error">Last name error</p>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="userDetails">
+                <form th:object="${user}" th:action="@{/userUpdate/email}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <label th:for="eMail">Email: <span th:text="*{eMail}"></span></label>
+                    <img id="emailUpdateImage" class="updateImage" th:src="@{image/update.png}"
+                         onmouseenter="updateImageFunction()">
+                    <div id="emailUpdate">
+                        <input type="text" th:id="eMail" th:field="*{eMail}">
+                        <p th:if="${#fields.hasErrors('eMail')}"
+                           th:errors="*{eMail}"
+                           class="error">Email error</p>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <a class="userDetails" href="/user">Cancel</a>
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="password">
+            <form id="tab2" th:action="@{/userUpdate/password}" th:object="${user}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="userDetails">
+                    <label th:for="oldPassword">Old password:</label>
+                    <input type="password" th:id="oldPassword" th:field="*{oldPassword}" class="input-xlarge">
+                </div>
+                <div class="userDetails">
+                    <label th:for="newPassword">New password:</label>
+                    <input type="password" th:id="newPassword" th:field="*{password}" class="input-xlarge">
+                </div>
+                <div class="userDetails">
+                    <label th:for="re-password">Repeat new password:</label>
+                    <input type="password" th:id="re-password" th:field="*{rePassword}" class="input-xlarge">
+                </div>
+                <div>
+                    <button class="btn btn-primary">Update</button>
+                    <a class="userDetails" href="/user">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="js/function-scripts.js"></script>
+</body>
+</html>
