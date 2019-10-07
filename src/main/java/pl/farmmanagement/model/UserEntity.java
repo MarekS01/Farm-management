@@ -11,10 +11,11 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SequenceGenerator(name = "initialValue",initialValue = 1000)
 public class UserEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "initialValue")
   private Long id;
 
   private String userName;

@@ -23,6 +23,7 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/user/operations")
+@PreAuthorize("hasRole('USER')")
 public class FieldOperationController {
 
     private final FieldOperationService fieldOperationService;
@@ -33,22 +34,20 @@ public class FieldOperationController {
         webDataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public String operations(@RequestParam("id") Long id,
-                             @RequestParam(value = "fieldName") String fieldName,
+                             @RequestParam("fieldName") String fieldName,
                              Model model,
                              HttpServletRequest request) {
 
         request.getSession().setAttribute("fieldId", id);
         request.getSession().setAttribute("fieldName", fieldName);
-        List<FieldOperationEntity> allFieldOperations =
+        List<FieldOperation> allFieldOperations =
                 fieldOperationService.findAllOperationsByField(id);
         model.addAttribute("operations", allFieldOperations);
         return "operations";
     }
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping(value = "/new")
     public String newOperation(Model model, HttpServletRequest request) {
         FieldOperation fieldOperation = new FieldOperation();
@@ -57,7 +56,6 @@ public class FieldOperationController {
         return "operation-form";
     }
 
-    @PreAuthorize("hasRole('USER')")
     @PostMapping(value = "/new")
     public String processForm(@ModelAttribute("operation") @Valid FieldOperation newOperation,
                               BindingResult result,
@@ -76,21 +74,18 @@ public class FieldOperationController {
         }
     }
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/updateOperation")
-    public String updateOperations(@RequestParam Long id, Model model, HttpServletRequest request) {
+    public String updateOperations(@RequestParam("id") Long id, Model model, HttpServletRequest request) {
         Optional<FieldOperation> theOperation = fieldOperationService.findOperationById(id);
-        FieldOperation fieldOperation;
-        fieldOperation = theOperation.orElseGet(FieldOperation::new);
+        FieldOperation fieldOperation = theOperation.orElseGet(FieldOperation::new);
         request.getSession().setAttribute("addOrUpdateOperation", "Update");
         model.addAttribute("operation", fieldOperation);
         return "operation-form";
     }
 
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/delete")
-    public String deleteById(@RequestParam Long id,
+    public String deleteById(@RequestParam("id") Long id,
                              HttpServletRequest request) {
         Long fieldId = (Long) request.getSession().getAttribute("fieldId");
         String fieldName = (String) request.getSession().getAttribute("fieldName");

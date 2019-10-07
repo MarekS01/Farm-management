@@ -3,7 +3,6 @@ package pl.farmmanagement.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,12 +10,12 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import pl.farmmanagement.model.FieldDTO;
 import pl.farmmanagement.model.UserEntity;
-import pl.farmmanagement.security.LoggedUserDetails;
 import pl.farmmanagement.service.FieldService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/user")
@@ -42,7 +41,7 @@ public class FieldController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/newField")
-    public String saveField(@AuthenticationPrincipal LoggedUserDetails userDetails,
+    public String saveField(Principal loggedUserDetails,
                             @ModelAttribute("newField") @Valid FieldDTO field,
                             BindingResult bindingResult,
                             HttpServletResponse response) {
@@ -51,7 +50,7 @@ public class FieldController {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return "newField-form";
         } else {
-            UserEntity fieldOwner = fieldService.findFieldOwner(userDetails.getId());
+            UserEntity fieldOwner = fieldService.findFieldOwnerByName(loggedUserDetails.getName());
             field.setUserEntity(fieldOwner);
             fieldService.addField(field);
             return "redirect:/user";

@@ -23,9 +23,8 @@ public class FieldService {
         return mapToFieldDTO(savedField);
     }
 
-    public UserEntity findFieldOwner(Long id){
-        Optional<UserEntity> user = userRepository.findById(id);
-        return user.get();
+    public UserEntity findFieldOwnerByName(String name){
+        return userRepository.findByUserNameIgnoreCase(name);
     }
 
     public FieldDTO findFieldById(Long id){

@@ -3,6 +3,8 @@ package pl.farmmanagement.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,20 +20,17 @@ public class SecurityUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-
     @Override
-    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUserNameIgnoreCase(login);
 
-        if(user==null){
-            throw  new UsernameNotFoundException("Username with login "
-                    + login + " not found");
+        if (user == null) {
+            throw new UsernameNotFoundException("Username with login " + login + " not found");
         }
-
-        return new LoggedUserDetails(user.getUserName(), user.getPassword(), mapRoles(user),user.getId());
+        return new User(user.getUserName(), user.getPassword(), mapRoles(user));
     }
 
     private List<GrantedAuthority> mapRoles(UserEntity user) {
-    return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole())).collect(Collectors.toList());
+        return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole())).collect(Collectors.toList());
     }
 }

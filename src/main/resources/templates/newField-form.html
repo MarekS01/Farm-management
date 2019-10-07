@@ -25,6 +25,10 @@
                        th:errors="*{name}"
                        class="error">Field name error</p>
                     </p>
+                    <p th:if="${#fields.hasErrors('global')}"
+                       th:errors="*{global}"
+                       class="error">Field name error</p>
+                    </p>
                 </td>
             </tr>
             <tr>
