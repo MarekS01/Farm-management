@@ -9,6 +9,7 @@ import pl.farmmanagement.repository.FieldRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ public class FieldOperationService {
     private final FieldRepository fieldRepository;
 
     public FieldOperation addFieldOperation(Long fieldId, FieldOperation fieldOperation) {
-
         fieldRepository.findById(fieldId)
                 .ifPresent(fieldOperation::setFieldEntity);
         FieldOperationEntity fieldOperationEntity = mapToFieldOperationEntity(fieldOperation);
@@ -26,8 +26,12 @@ public class FieldOperationService {
         return mapToFieldOperation(fieldOperationEntity);
     }
 
-    public List<FieldOperationEntity> findAllOperationsByField(Long id) {
-        return fieldOperationRepository.findAllByFieldEntityIdOrderByOperationDate(id);
+    public List<FieldOperation> findAllOperationsByField(Long id) {
+        List<FieldOperationEntity> fieldOperations =
+                fieldOperationRepository.findAllByFieldEntityIdOrderByOperationDate(id);
+        return fieldOperations.stream()
+                .map(this::mapToFieldOperation)
+                .collect(Collectors.toList());
     }
 
     public Optional<FieldOperation> findOperationById(Long id) {
@@ -40,14 +44,14 @@ public class FieldOperationService {
         }
     }
 
-    public FieldOperation doneTask(Long fieldId, Long id) {
-        Optional<FieldOperationEntity> foundOperation = fieldOperationRepository.findById(id);
+    public Optional<FieldOperation> doneTask(Long fieldId, Long operationId) {
+        Optional<FieldOperationEntity> foundOperation = fieldOperationRepository.findById(operationId);
         foundOperation.ifPresent(operation -> {
             operation.setDone(true);
             FieldOperation fieldOperation = mapToFieldOperation(operation);
             addFieldOperation(fieldId,fieldOperation);
         });
-        return mapToFieldOperation(foundOperation.get());
+        return foundOperation.map(this::mapToFieldOperation);
     }
 
     public void deleteById(Long id) {

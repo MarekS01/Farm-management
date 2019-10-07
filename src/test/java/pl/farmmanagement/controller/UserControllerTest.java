@@ -9,6 +9,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -16,15 +19,18 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.farmmanagement.model.FieldEntity;
 import pl.farmmanagement.model.User;
+import pl.farmmanagement.repository.UserRepository;
+import pl.farmmanagement.security.SecurityUserDetailsService;
 import pl.farmmanagement.service.UserService;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(UserController.class)
+@WebMvcTest(value = UserController.class)
+@MockBean({SecurityUserDetailsService.class, AuthenticationSuccessHandler.class, UserRepository.class})
 public class UserControllerTest {
 
     @Autowired
@@ -45,6 +51,7 @@ public class UserControllerTest {
                 .id(1L)
                 .userName("root12")
                 .password("root1234")
+                .rePassword("root1234")
                 .eMail("root@gmail.com")
                 .givenName("Root")
                 .surname("Root")
@@ -52,32 +59,32 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenAccessSignUpEndPoint_thenReturnsOkStatus() throws Exception {
+    public void whenAccessSignUpEndPoint_thenReturnsOkStatusAndViewDetails() throws Exception {
 
         mvc.perform(MockMvcRequestBuilders.get("/signUp"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("newUser-form.html"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("user"));
     }
 
     @Test
-    public void whenAccessHomeEndPoint_thenReturnsOkStatus() throws Exception {
+    public void whenAccessHomeEndPoint_thenReturnsOkStatusAndViewDetails() throws Exception {
 
         mvc.perform(MockMvcRequestBuilders.get("/"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        mvc.perform(MockMvcRequestBuilders.get("/home"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("loginPage.html"));
     }
 
     @Test
-    public void whenCreateUserWithCorrectData_thenReturnsFoundStatusAndUserDetailsAreCorrect() throws Exception {
+    public void whenCreateUserWithCorrectData_thenReturnsFoundStatusAndUserDetails() throws Exception {
 
         mvc.perform(MockMvcRequestBuilders.post("/signUp")
                 .flashAttr("user", user))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isFound());
+                .andExpect(MockMvcResultMatchers.status().isFound())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/"));
 
         Mockito.verify(userService, Mockito.times(1))
                 .add(argumentCaptor.capture());
@@ -89,49 +96,58 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenCreateUserWithIncorrectDta_thenReturnsConflictStatus() throws Exception {
+    public void whenCreateUserWithIncorrectDta_thenReturnsConflictStatusAndViewDetails() throws Exception {
         String invalidName = "";
         user.setUserName(invalidName);
 
         mvc.perform(MockMvcRequestBuilders.post("/signUp")
                 .flashAttr("user", user))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isConflict());
-
-        Mockito.verify(userService, Mockito.times(0)).add(user);
+                .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.view().name("newUser-form"));
     }
 
     @Test
-    public void whenLoggedInSuccessful_thenReturnsFoundStatusAndUserView() throws Exception {
-        String validName = "root12";
-        String validPassword = "root1234";
+    public void whenUserIsAnonymous_thenUserIsUnauthenticatedAndSecuredViewReturnsIsFoundStatus() throws Exception {
 
-        Mockito.when(userService.getByUserNameAndPassword(validName, validPassword))
-                .thenReturn(Optional.of(user));
-        mvc.perform(MockMvcRequestBuilders.post("/user")
-                .flashAttr("user", user))
+        mvc.perform(MockMvcRequestBuilders.get("/user"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.view().name("redirect:/user"));
+                .andExpect(SecurityMockMvcResultMatchers.unauthenticated());
     }
 
+    @WithMockUser
     @Test
-    public void whenLoggedInFailed_thenReturnsFoundStatusAndHomeView() throws Exception {
-        String invalidName = "root";
-        String validPassword = "root1234";
+    public void whenUserIsLogged_thenUserSecuredViewReturnsOkStatusAndUserAuthentication() throws Exception {
 
-        Mockito.when(userService.getByUserNameAndPassword(invalidName, validPassword))
-                .thenReturn(Optional.of(user));
-
-        mvc.perform(MockMvcRequestBuilders.post("/user")
-                .flashAttr("user", user))
+        mvc.perform(MockMvcRequestBuilders.get("/user"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.view().name("redirect:/home"));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(authenticated().withRoles("USER"));
     }
 
+    @WithMockUser(roles = "ADMIN")
     @Test
-    public void whenLoggedInSuccessful_thenReturnsOkStatusAndAllUserField() throws Exception {
+    public void whenAdminIsLogged_thenUserHasAdminAuthenticationAndAdminSecuredViewReturnsOkStatus() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders.get("/admin"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(authenticated().withRoles("ADMIN"));
+    }
+
+    @WithMockUser
+    @Test
+    public void whenUserIsLogged_thenAdminSecuredViewIsForbidden() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders.get("/admin"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @WithMockUser
+    @Test
+    public void whenUserLoggedInSuccessful_thenReturnsOkStatusAndAllUserField() throws Exception {
 
         FieldEntity field1 = FieldEntity
                 .builder()
@@ -140,11 +156,10 @@ public class UserControllerTest {
                 .area(0.8)
                 .build();
 
-        Mockito.when(userService.getAllUserFieldById(1L))
+        Mockito.when(userService.findAllUserFieldByUserName("user"))
                 .thenReturn(Collections.singletonList(field1));
 
-        mvc.perform(MockMvcRequestBuilders.get("/user")
-                .sessionAttr("userId", 1L))
+        mvc.perform(MockMvcRequestBuilders.get("/user"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().attribute("fields", Collections.singletonList(field1)));

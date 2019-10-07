@@ -8,56 +8,52 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.farmmanagement.model.FieldEntity;
+import pl.farmmanagement.model.UserEntity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class FieldRepositoryTest {
 
+    private static final double MIN_FIELD_AREA = 0.01;
     private FieldEntity fieldEntity;
+    private UserEntity userEntity;
 
     @Autowired
-    TestEntityManager testEntityManager;
+    private TestEntityManager testEntityManager;
 
     @Autowired
-    FieldRepository repository;
+    private FieldRepository fieldRepository;
 
     @Before
     public void setUp() {
         fieldEntity = FieldEntity
                 .builder()
-                .name("Field-1")
+                .name("FIELD1")
                 .area(0.8)
+                .build();
+
+        userEntity = UserEntity.builder()
+                .id(1000L)
+                .userName("user")
+                .password("password")
+                .userFields(Arrays.asList(fieldEntity))
                 .build();
     }
 
     @Test
-    public void whenAddField_thenShouldSaveField() {
+    public void whenFindFieldByNameIgnoreCaseAndUser_thenReturnsFoundField(){
+        String fieldNameWithoutUpperCase = "field1";
+        testEntityManager.persistAndFlush(fieldEntity);
 
-        fieldEntity = testEntityManager.persistAndFlush(fieldEntity);
+        FieldEntity foundField = fieldRepository.findByNameIgnoreCase(fieldNameWithoutUpperCase);
 
-        assertEquals(fieldEntity, repository.findById(fieldEntity.getId()).get());
+        assertNotNull(foundField);
+        assertEquals("FIELD1",foundField.getName());
+        assertEquals(0.8,foundField.getArea(), MIN_FIELD_AREA);
     }
 
-    @Test
-    public void whenFindFieldById_thenShouldFindField() {
-
-        Long theId = (Long) testEntityManager.persistAndGetId(fieldEntity);
-        FieldEntity foundField = testEntityManager.find(FieldEntity.class, theId);
-
-        assertEquals(fieldEntity, foundField);
-    }
-
-    @Test
-    public void whenDeleteField_thenFieldShouldBeRemoved() {
-
-        Long theId = (Long) testEntityManager.persistAndGetId(fieldEntity);
-        testEntityManager.remove(fieldEntity);
-
-        FieldEntity foundField = testEntityManager.find(FieldEntity.class, theId);
-
-        assertNull(foundField);
-    }
 }

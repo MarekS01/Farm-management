@@ -3,47 +3,49 @@ package pl.farmmanagement.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.UpdateUserDTO;
-import pl.farmmanagement.model.User;
-import pl.farmmanagement.model.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import pl.farmmanagement.model.*;
+import pl.farmmanagement.repository.RoleRepository;
 import pl.farmmanagement.repository.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserServiceTest {
 
     private UserEntity userEntity;
-    private User user;
+    private User userDTO;
 
-    @Mock
+    @Autowired
+    private UserService userService;
+
+    @MockBean
     private UserRepository userRepository;
 
-    @InjectMocks
-    private UserService userService;
+    @MockBean
+    private RoleRepository roleRepository;
 
     @Before
     public void setUp() {
         userEntity = UserEntity
                 .builder()
+                .id(1L)
                 .userName("root12")
                 .password("root1234")
                 .eMail("root@gmail.com")
                 .build();
 
-        user = User
+        userDTO = User
                 .builder()
+                .id(1L)
                 .userName("root12")
                 .password("root1234")
                 .eMail("root@gmail.com")
@@ -51,61 +53,90 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenAddUser_thenSaveUserAndReturnsCorrectUserDetailsWithId() {
+    public void whenAddUser_thenSaveUserAndReturnsCorrectUserDetails() {
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
-        Mockito.when(userRepository.save(userEntity))
-                .then((Answer<UserEntity>) invocationOnMock -> {
-                    userEntity.setId(1L);
-                    return userEntity;
-                });
-
-        User addedUser = userService.add(user);
+        User addedUser = userService.add(userDTO);
 
         assertEquals(Long.valueOf(1), addedUser.getId());
-        assertEquals(user.getUserName(), addedUser.getUserName());
-        assertEquals(user.getPassword(), addedUser.getPassword());
-        assertEquals(user.getEMail(), addedUser.getEMail());
+        assertEquals(userDTO.getUserName(), addedUser.getUserName());
+        assertEquals(userDTO.getEMail(), addedUser.getEMail());
         assertNull(addedUser.getGivenName());
         assertNull(addedUser.getSurname());
     }
 
-//    @Test
-//    public void whenGetByUserName_thenReturnsSearchedUser(){
-//        String userName = "root12";
-//        Mockito.when(userRepository.findByUserNameIgnoreCase(userName)).thenReturn(userEntity);
-//
-//        UpdateUserDTO returnedUser = userService.getByUserName(userName);
-//
-//        assertEquals(user,returnedUser);
-//    }
-
     @Test
-    public void whenGetByUserNameAndPassword_thenReturnsSearchedUser(){
-        String userName = "root12";
-        String password = "root1234";
+    public void whenFindAllUsers_thenReturnsAllUsersList(){
+        UserRole userRole = UserRole.builder()
+                .id(1L)
+                .role("USER")
+                .build();
 
-        Mockito.when(userRepository.findByUserNameIgnoreCaseAndPassword(userName,password))
-                .thenReturn(Optional.of(userEntity));
+        when(roleRepository.findByRole("USER")).thenReturn(userRole);
+        when(userRepository.findAllByRoles(userRole))
+                .thenReturn(Arrays.asList(userEntity));
 
-        Optional<User> foundUser = userService.getByUserNameAndPassword(userName, password);
+        List<User> allUsers = userService.findAllUsers();
 
-        assertEquals(user,foundUser.get());
+        assertEquals(1,allUsers.size());
+        assertEquals(Long.valueOf(1),allUsers.get(0).getId());
     }
 
     @Test
-    public void whenGetAllUserFieldsById_thenReturnsAllUserFields(){
+    public void whenFindUserByExistingUserId_theReturnsUser(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+
+        Optional<User> foundedUser = userService.findByUserId(1L);
+
+        assertEquals(userDTO,foundedUser.get());
+    }
+
+    @Test
+    public void whenFindUserByNotExistingUserId_thenNotFindUser(){
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Optional<User> foundedUser = userService.findByUserId(1L);
+
+        assertFalse(foundedUser.isPresent());
+    }
+
+    @Test
+    public void whenDeleteUserById_thenRemoveUser(){
+        userService.delete(1L);
+
+        verify(userRepository,times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void whenGetByUserNameAndPassword_thenReturnsSearchedUser() {
+        String userName = "root12";
+        String password = "root1234";
+
+        when(userRepository.findByUserNameIgnoreCaseAndPassword(userName, password))
+                .thenReturn(Optional.of(userEntity));
+
+        Optional<User> foundUser = userService.findByUserNameAndPassword(userName, password);
+
+        assertTrue(foundUser.isPresent());
+        assertEquals(userDTO, foundUser.get());
+    }
+
+    @Test
+    public void whenGetAllUserFieldsByUserName_thenReturnsAllUserFields() {
+        String userName = "user";
+
         FieldEntity field = FieldEntity
                 .builder()
                 .name("Field-1")
                 .area(2.2)
                 .build();
 
-        Mockito.when(userRepository.userFieldsById(1L))
-                .thenReturn(Collections.singletonList(field));
-        List<FieldEntity> userFields = userService.getAllUserFieldById(1L);
+        List<FieldEntity> fieldsList = Arrays.asList(field);
 
-        assertEquals(Collections.singletonList(field),userFields);
+        when(userRepository.userFieldsByUserName(userName))
+                .thenReturn(fieldsList);
+        List<FieldEntity> userFields = userService.findAllUserFieldByUserName(userName);
+
+        assertEquals(fieldsList, userFields);
     }
-
-
 }

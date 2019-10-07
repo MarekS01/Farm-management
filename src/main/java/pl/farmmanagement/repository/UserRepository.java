@@ -14,8 +14,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByUserNameIgnoreCase(String name);
     Optional<UserEntity> findByUserNameIgnoreCaseAndPassword(String userName, String password);
 
-    @Query("SELECT userFields from UserEntity u where u.id=?1")
-    List<FieldEntity> userFieldsById(Long id);
+    @Query("SELECT userFields from UserEntity u where u.userName=?1")
+    List<FieldEntity> userFieldsByUserName(String name);
 
     List<UserEntity> findAllByRoles(UserRole role);
 }
