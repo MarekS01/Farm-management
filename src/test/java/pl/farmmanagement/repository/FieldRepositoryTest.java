@@ -11,6 +11,7 @@ import pl.farmmanagement.model.FieldEntity;
 import pl.farmmanagement.model.UserEntity;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -30,30 +31,34 @@ public class FieldRepositoryTest {
 
     @Before
     public void setUp() {
-        fieldEntity = FieldEntity
-                .builder()
-                .name("FIELD1")
-                .area(0.8)
-                .build();
-
         userEntity = UserEntity.builder()
                 .id(1000L)
                 .userName("user")
                 .password("password")
-                .userFields(Arrays.asList(fieldEntity))
                 .build();
+
+        fieldEntity = FieldEntity
+                .builder()
+                .name("FIELD1")
+                .area(0.8)
+                .user(userEntity)
+                .build();
+
+
     }
 
     @Test
     public void whenFindFieldByNameIgnoreCaseAndUser_thenReturnsFoundField(){
         String fieldNameWithoutUpperCase = "field1";
+        testEntityManager.merge(userEntity);
         testEntityManager.persistAndFlush(fieldEntity);
 
-        FieldEntity foundField = fieldRepository.findByNameIgnoreCase(fieldNameWithoutUpperCase);
+        Optional<FieldEntity> foundField = fieldRepository
+                .findByNameIgnoreCaseAndUserName(fieldNameWithoutUpperCase,userEntity.getUserName());
 
-        assertNotNull(foundField);
-        assertEquals("FIELD1",foundField.getName());
-        assertEquals(0.8,foundField.getArea(), MIN_FIELD_AREA);
+        assertTrue(foundField.isPresent());
+        assertEquals("FIELD1",foundField.get().getName());
+        assertEquals(0.8,foundField.get().getArea(), MIN_FIELD_AREA);
     }
 
 }
