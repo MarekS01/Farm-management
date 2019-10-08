@@ -21,6 +21,7 @@ import pl.farmmanagement.security.SecurityUserDetailsService;
 import pl.farmmanagement.service.FieldService;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
 @RunWith(SpringRunner.class)
@@ -78,7 +79,7 @@ public class FieldControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isFound())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/user"));
 
-        Mockito.verify(fieldService, times(1)).addField(argumentCaptor.capture());
+        Mockito.verify(fieldService, times(1)).addField(any(),argumentCaptor.capture());
         assertEquals("Field-1", argumentCaptor.getValue().getName());
         assertEquals(10.1, argumentCaptor.getValue().getArea(), MIN_FIELD_SIZE);
     }

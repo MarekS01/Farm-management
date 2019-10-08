@@ -41,9 +41,9 @@ public class UserUpdateController {
                                       BindingResult bindingResult,
                                       HttpServletRequest request) {
         if (bindingResult.hasFieldErrors("givenName")) {
-            request.getSession().setAttribute("updateMessage","Incorrect new first name");
+            request.getSession().setAttribute("updateMessage", "Incorrect new first name");
         } else {
-            request.getSession().setAttribute("updateMessage","The first name was changed successfully");
+            request.getSession().setAttribute("updateMessage", "The first name was changed successfully");
             userUpdateService.updateUserGivenName(user);
         }
         return "redirect:/userUpdate";
@@ -54,9 +54,9 @@ public class UserUpdateController {
                                     BindingResult bindingResult,
                                     HttpServletRequest request) {
         if (bindingResult.hasFieldErrors("surname")) {
-            request.getSession().setAttribute("updateMessage","Incorrect new last name");
+            request.getSession().setAttribute("updateMessage", "Incorrect new last name");
         } else {
-            request.getSession().setAttribute("updateMessage","The last name was changed successfully");
+            request.getSession().setAttribute("updateMessage", "The last name was changed successfully");
             userUpdateService.updateUserSurname(user);
         }
         return "redirect:/userUpdate";
@@ -67,9 +67,9 @@ public class UserUpdateController {
                               BindingResult bindingResult,
                               HttpServletRequest request) {
         if (bindingResult.hasFieldErrors("eMail")) {
-            request.getSession().setAttribute("updateMessage","Incorrect new email");
+            request.getSession().setAttribute("updateMessage", "Incorrect new email");
         } else {
-            request.getSession().setAttribute("updateMessage","The email was changed successfully");
+            request.getSession().setAttribute("updateMessage", "The email was changed successfully");
             userUpdateService.updateUserEmail(user);
         }
         return "redirect:/userUpdate";
@@ -80,9 +80,9 @@ public class UserUpdateController {
                                  BindingResult bindingResult,
                                  HttpServletRequest request) {
         if (bindingResult.hasGlobalErrors()) {
-            request.getSession().setAttribute("updateMessage","Password change failed");
+            request.getSession().setAttribute("updateMessage", "Password change failed");
         } else {
-            request.getSession().setAttribute("updateMessage","The password was changed successfully");
+            request.getSession().setAttribute("updateMessage", "The password was changed successfully");
             userUpdateService.updateUserPassword(user);
         }
         return "redirect:/userUpdate";

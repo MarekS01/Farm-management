@@ -8,10 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import pl.farmmanagement.model.FieldDTO;
-import pl.farmmanagement.model.FieldEntity;
 import pl.farmmanagement.model.FieldOperation;
-import pl.farmmanagement.model.FieldOperationEntity;
 import pl.farmmanagement.service.FieldOperationService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +65,7 @@ public class FieldOperationController {
         } else {
             Long fieldId = (Long) request.getSession().getAttribute("fieldId");
             String fieldName = (String) request.getSession().getAttribute("fieldName");
-            fieldOperationService.addFieldOperation(fieldId,newOperation);
+            fieldOperationService.addFieldOperation(fieldId, newOperation);
             return String.format("redirect:/user/operations?id=%d&fieldName=%s",
                     fieldId, fieldName);
         }
@@ -90,14 +87,14 @@ public class FieldOperationController {
         Long fieldId = (Long) request.getSession().getAttribute("fieldId");
         String fieldName = (String) request.getSession().getAttribute("fieldName");
         fieldOperationService.deleteById(id);
-        return String.format("redirect:/user/operations?id=%d&fieldName=%s", fieldId,fieldName);
+        return String.format("redirect:/user/operations?id=%d&fieldName=%s", fieldId, fieldName);
     }
 
     @GetMapping("/doneTask")
-    public String doneTask(@RequestParam("id") Long operationId, HttpServletRequest request){
+    public String doneTask(@RequestParam("id") Long operationId, HttpServletRequest request) {
         Long fieldId = (Long) request.getSession().getAttribute("fieldId");
         String fieldName = (String) request.getSession().getAttribute("fieldName");
-        fieldOperationService.doneTask(fieldId,operationId);
-        return String.format("redirect:/user/operations?id=%d&fieldName=%s", fieldId,fieldName);
+        fieldOperationService.doneTask(fieldId, operationId);
+        return String.format("redirect:/user/operations?id=%d&fieldName=%s", fieldId, fieldName);
     }
 }

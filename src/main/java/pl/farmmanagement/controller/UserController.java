@@ -26,7 +26,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @InitBinder
     public void initBinder(WebDataBinder webDataBinder) {
         StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
@@ -57,7 +56,7 @@ public class UserController {
             return "newUser-form";
         } else {
             userService.add(user);
-            return adminDetails != null && "admin".equalsIgnoreCase(adminDetails.getName())?
+            return adminDetails != null && "admin".equalsIgnoreCase(adminDetails.getName()) ?
                     "redirect:/admin" : "redirect:/";
         }
     }

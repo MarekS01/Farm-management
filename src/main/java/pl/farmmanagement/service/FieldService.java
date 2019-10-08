@@ -8,8 +8,6 @@ import pl.farmmanagement.model.UserEntity;
 import pl.farmmanagement.repository.FieldRepository;
 import pl.farmmanagement.repository.UserRepository;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class FieldService {
@@ -17,8 +15,10 @@ public class FieldService {
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
 
-    public FieldDTO addField(FieldDTO dto) {
-        FieldEntity field = mapToFieldEntity(dto);
+    public FieldDTO addField(String userName, FieldDTO addField) {
+        UserEntity fieldOwner = findFieldOwnerByName(userName);
+        addField.setUserEntity(fieldOwner);
+        FieldEntity field = mapToFieldEntity(addField);
         FieldEntity savedField = fieldRepository.save(field);
         return mapToFieldDTO(savedField);
     }

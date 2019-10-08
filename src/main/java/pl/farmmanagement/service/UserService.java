@@ -2,7 +2,10 @@ package pl.farmmanagement.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.farmmanagement.model.*;
+import pl.farmmanagement.model.FieldEntity;
+import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.UserRole;
 import pl.farmmanagement.repository.RoleRepository;
 import pl.farmmanagement.repository.UserRepository;
 import pl.farmmanagement.security.SecurityConfig;
