@@ -3,8 +3,6 @@ package pl.farmmanagement.helper;
 import lombok.RequiredArgsConstructor;
 import pl.farmmanagement.model.UpdateUserDTO;
 import pl.farmmanagement.model.User;
-import pl.farmmanagement.model.UserEntity;
-import pl.farmmanagement.repository.UserRepository;
 import pl.farmmanagement.security.SecurityConfig;
 import pl.farmmanagement.service.UserService;
 

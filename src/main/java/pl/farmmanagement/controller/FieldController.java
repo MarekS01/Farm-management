@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import pl.farmmanagement.model.FieldDTO;
-import pl.farmmanagement.model.UserEntity;
 import pl.farmmanagement.service.FieldService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,9 +49,7 @@ public class FieldController {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return "newField-form";
         } else {
-            UserEntity fieldOwner = fieldService.findFieldOwnerByName(loggedUserDetails.getName());
-            field.setUserEntity(fieldOwner);
-            fieldService.addField(field);
+            fieldService.addField(loggedUserDetails.getName(), field);
             return "redirect:/user";
         }
     }
