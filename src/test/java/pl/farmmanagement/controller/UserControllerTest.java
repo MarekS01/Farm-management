@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.repository.UserRepository;
 import pl.farmmanagement.security.SecurityUserDetailsService;
 import pl.farmmanagement.service.UserService;
@@ -40,13 +40,13 @@ public class UserControllerTest {
     private UserService userService;
 
     @Captor
-    private ArgumentCaptor<User> argumentCaptor;
+    private ArgumentCaptor<UserDTO> argumentCaptor;
 
-    private User user;
+    private UserDTO user;
 
     @Before
     public void setUp() {
-        user = User
+        user = UserDTO
                 .builder()
                 .id(1L)
                 .userName("root12")
@@ -103,7 +103,7 @@ public class UserControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/signUp")
                 .flashAttr("user", user))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.view().name("newUser-form"));
     }
 
@@ -149,7 +149,7 @@ public class UserControllerTest {
     @Test
     public void whenUserLoggedInSuccessful_thenReturnsOkStatusAndAllUserField() throws Exception {
 
-        FieldEntity field1 = FieldEntity
+        Field field1 = Field
                 .builder()
                 .id(1L)
                 .name("Field-1")

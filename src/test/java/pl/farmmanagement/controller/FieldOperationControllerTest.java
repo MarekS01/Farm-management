@@ -8,12 +8,11 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import pl.farmmanagement.model.FieldOperation;
+import pl.farmmanagement.model.dto.FieldOperationDTO;
 import pl.farmmanagement.security.SecurityUserDetailsService;
 import pl.farmmanagement.service.FieldOperationService;
 
@@ -45,13 +44,13 @@ public class FieldOperationControllerTest {
     private FieldOperationService fieldOperationService;
 
     @Captor
-    private ArgumentCaptor<FieldOperation> argumentCaptor;
+    private ArgumentCaptor<FieldOperationDTO> argumentCaptor;
 
-    private FieldOperation fieldOperation;
+    private FieldOperationDTO fieldOperation;
 
     @Before
     public void setUp() {
-        fieldOperation = FieldOperation.builder()
+        fieldOperation = FieldOperationDTO.builder()
                 .id(1L)
                 .task("First task")
                 .operationDate(LocalDate.of(2019, 10, 01))
@@ -71,7 +70,7 @@ public class FieldOperationControllerTest {
 
     @Test
     public void whenUserGetAllFieldOperations_thenReturnViewWithAllOperations() throws Exception {
-        List<FieldOperation> fieldOperations = Arrays.asList(fieldOperation);
+        List<FieldOperationDTO> fieldOperations = Arrays.asList(fieldOperation);
 
         when(fieldOperationService.findAllOperationsByField(1L)).thenReturn(fieldOperations);
 
@@ -107,7 +106,7 @@ public class FieldOperationControllerTest {
                 .sessionAttr("fieldName", "Field-1")
                 .flashAttr("operation", fieldOperation))
                 .andDo(print())
-                .andExpect(status().isConflict())
+                .andExpect(status().isBadRequest())
                 .andExpect(view().name("operation-form"));
     }
 

@@ -1,11 +1,11 @@
 package pl.farmmanagement.helper;
 
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.dto.UserDTO;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PasswordValidator implements ConstraintValidator<PasswordValid, User> {
+public class PasswordValidator implements ConstraintValidator<PasswordValid, UserDTO> {
 
 
     @Override
@@ -13,7 +13,7 @@ public class PasswordValidator implements ConstraintValidator<PasswordValid, Use
     }
 
     @Override
-    public boolean isValid(User user, ConstraintValidatorContext context) {
+    public boolean isValid(UserDTO user, ConstraintValidatorContext context) {
         String thePassword = user.getPassword();
         if (thePassword != null) {
             return user.getPassword().equals(user.getRePassword());

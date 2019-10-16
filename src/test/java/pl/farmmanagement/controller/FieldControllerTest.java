@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import pl.farmmanagement.model.FieldDTO;
+import pl.farmmanagement.model.dto.FieldDTO;
 import pl.farmmanagement.repository.FieldRepository;
 import pl.farmmanagement.security.SecurityUserDetailsService;
 import pl.farmmanagement.service.FieldService;
@@ -61,7 +61,7 @@ public class FieldControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/user/newField")
                 .flashAttr("newField", field))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.view().name("newField-form"));
     }
 

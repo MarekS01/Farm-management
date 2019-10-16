@@ -10,10 +10,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import pl.farmmanagement.model.FieldDTO;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.FieldOperation;
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.dto.FieldDTO;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.dto.FieldOperationDTO;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.security.SecurityConfig;
 import pl.farmmanagement.service.FieldOperationService;
 import pl.farmmanagement.service.UserService;
@@ -34,9 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class UserOperationTest {
 
-    private User user;
+    private UserDTO user;
     private FieldDTO field;
-    private FieldOperation fieldOperation;
+    private FieldOperationDTO fieldOperation;
 
     @Autowired
     private SecurityConfig securityConfig;
@@ -52,7 +52,7 @@ public class UserOperationTest {
 
     @Before
     public void setUp() {
-        user = User.builder()
+        user = UserDTO.builder()
                 .userName("user1234")
                 .password("pass1234")
                 .rePassword("pass1234")
@@ -64,7 +64,7 @@ public class UserOperationTest {
                 .name("Field-1")
                 .area(0.8)
                 .build();
-        fieldOperation = FieldOperation.builder()
+        fieldOperation = FieldOperationDTO.builder()
                 .task("Task-1")
                 .operationDate(LocalDate.of(2019, 10, 01))
                 .build();
@@ -77,9 +77,9 @@ public class UserOperationTest {
                 .flashAttr("user", user))
                 .andDo(print())
                 .andExpect(redirectedUrl("/"));
-        List<User> allUsers = userService.findAllUsers();
+        List<UserDTO> allUsers = userService.findAllUsers();
         assertEquals(1, allUsers.size());
-        User foundUser = allUsers.get(0);
+        UserDTO foundUser = allUsers.get(0);
         assertEquals(user.getUserName(), foundUser.getUserName());
         assertTrue(securityConfig.passwordEncoder().matches(user.getPassword(), foundUser.getPassword()));
 
@@ -88,9 +88,9 @@ public class UserOperationTest {
                 .flashAttr("newField", field))
                 .andDo(print())
                 .andExpect(redirectedUrl("/user"));
-        List<FieldEntity> allUserField = userService.findAllUserFieldByUserName(foundUser.getUserName());
+        List<Field> allUserField = userService.findAllUserFieldByUserName(foundUser.getUserName());
         assertEquals(1, allUserField.size());
-        FieldEntity foundField = allUserField.get(0);
+        Field foundField = allUserField.get(0);
         assertEquals("Field-1", foundField.getName());
 
         Long foundFieldId = foundField.getId();
@@ -102,9 +102,9 @@ public class UserOperationTest {
                 .andDo(print())
                 .andExpect(redirectedUrl
                         (String.format("/user/operations?id=%d&fieldName=%s", foundFieldId, foundFieldName)));
-        List<FieldOperation> allFieldOperations = fieldOperationService.findAllOperationsByField(foundField.getId());
+        List<FieldOperationDTO> allFieldOperations = fieldOperationService.findAllOperationsByField(foundField.getId());
         assertEquals(1, allFieldOperations.size());
-        FieldOperation foundFieldOperation = allFieldOperations.get(0);
+        FieldOperationDTO foundFieldOperation = allFieldOperations.get(0);
         assertEquals("Task-1", foundFieldOperation.getTask());
         assertEquals(LocalDate.of(2019, 10, 01), foundFieldOperation.getOperationDate());
 
@@ -112,7 +112,7 @@ public class UserOperationTest {
                 .param("id", foundUser.getId().toString()))
                 .andDo(print())
                 .andExpect(redirectedUrl("/admin"));
-        List<User> allUsersAfterRemoved = userService.findAllUsers();
+        List<UserDTO> allUsersAfterRemoved = userService.findAllUsers();
         assertEquals(0, allUsersAfterRemoved.size());
     }
 }

@@ -3,15 +3,13 @@ package pl.farmmanagement.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.farmmanagement.model.UpdateUserDTO;
-import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.dto.UpdateUserDTO;
+import pl.farmmanagement.model.User;
 import pl.farmmanagement.repository.UserRepository;
-import pl.farmmanagement.security.SecurityConfig;
 
 import java.util.Optional;
 
@@ -22,7 +20,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class UserUpdateServiceTest {
 
-    private UserEntity userEntity;
+    private User userEntity;
     private UpdateUserDTO updateUserDTO;
 
     @Autowired
@@ -33,7 +31,7 @@ public class UserUpdateServiceTest {
 
     @Before
     public void setUp(){
-        userEntity = UserEntity.builder()
+        userEntity = User.builder()
                 .id(1L)
                 .surname("user")
                 .password("user")
@@ -67,6 +65,6 @@ public class UserUpdateServiceTest {
         userUpdateService.updateUserEmail(updateUserDTO);
         userUpdateService.updateUserPassword(updateUserDTO);
 
-        verify(userRepository,times(4)).save(any(UserEntity.class));
+        verify(userRepository,times(4)).save(any(User.class));
     }
 }

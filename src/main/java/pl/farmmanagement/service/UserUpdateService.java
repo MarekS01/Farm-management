@@ -2,8 +2,8 @@ package pl.farmmanagement.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.farmmanagement.model.UpdateUserDTO;
-import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.dto.UpdateUserDTO;
+import pl.farmmanagement.model.User;
 import pl.farmmanagement.repository.UserRepository;
 import pl.farmmanagement.security.SecurityConfig;
 
@@ -17,12 +17,12 @@ public class UserUpdateService {
     private final SecurityConfig securityConfig;
 
     public UpdateUserDTO findByUserName(String userName) {
-        UserEntity byUserName = userRepository.findByUserNameIgnoreCase(userName);
+        User byUserName = userRepository.findByUserNameIgnoreCase(userName);
         return mapToUpdateUserDTO(byUserName);
     }
 
     public void updateUserGivenName(UpdateUserDTO user) {
-        Optional<UserEntity> theUser = userRepository.findById(user.getId());
+        Optional<User> theUser = userRepository.findById(user.getId());
         theUser.ifPresent(currentUser -> {
             currentUser.setGivenName(user.getGivenName());
             userRepository.save(currentUser);
@@ -30,7 +30,7 @@ public class UserUpdateService {
     }
 
     public void updateUserSurname(UpdateUserDTO user) {
-        Optional<UserEntity> theUser = userRepository.findById(user.getId());
+        Optional<User> theUser = userRepository.findById(user.getId());
         theUser.ifPresent(currentUser -> {
             currentUser.setSurname(user.getSurname());
             userRepository.save(currentUser);
@@ -38,7 +38,7 @@ public class UserUpdateService {
     }
 
     public void updateUserEmail(UpdateUserDTO user) {
-        Optional<UserEntity> theUser = userRepository.findById(user.getId());
+        Optional<User> theUser = userRepository.findById(user.getId());
         theUser.ifPresent(currentUser -> {
             currentUser.setEMail(user.getEMail());
             userRepository.save(currentUser);
@@ -46,14 +46,14 @@ public class UserUpdateService {
     }
 
     public void updateUserPassword(UpdateUserDTO user) {
-        Optional<UserEntity> theUser = userRepository.findById(user.getId());
+        Optional<User> theUser = userRepository.findById(user.getId());
         theUser.ifPresent(currentUser -> {
             currentUser.setPassword(securityConfig.passwordEncoder().encode(user.getPassword()));
             userRepository.save(currentUser);
         });
     }
 
-    private UpdateUserDTO mapToUpdateUserDTO(UserEntity theUser) {
+    private UpdateUserDTO mapToUpdateUserDTO(User theUser) {
         return UpdateUserDTO.builder()
                 .id(theUser.getId())
                 .givenName(theUser.getGivenName())

@@ -6,28 +6,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class FieldOperationEntity {
+@NoArgsConstructor
+public class Field {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate operationDate;
+    private String name;
 
     @Column(nullable = false)
-    private String task;
+    private double area;
 
-    private boolean isDone;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "fieldEntity",
+    cascade = CascadeType.ALL)
+    private List<FieldOperation> operationsList;
 
     @ManyToOne
-    @JoinColumn(name = "field_id")
-    private FieldEntity fieldEntity;
+    @JoinColumn(name = "user_id")
+    private User user;
 }

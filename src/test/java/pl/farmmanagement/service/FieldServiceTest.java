@@ -3,14 +3,13 @@ package pl.farmmanagement.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.farmmanagement.model.FieldDTO;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.dto.FieldDTO;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.User;
 import pl.farmmanagement.repository.FieldRepository;
 import pl.farmmanagement.repository.UserRepository;
 
@@ -25,9 +24,9 @@ import static org.mockito.Mockito.*;
 public class FieldServiceTest {
 
     private static final double MIN_FIELD_SIZE = 0.01;
-    private FieldEntity fieldEntity;
+    private Field fieldEntity;
     private FieldDTO fieldDTO;
-    private UserEntity userEntity;
+    private User userEntity;
 
     @Autowired
     private FieldService fieldService;
@@ -40,7 +39,7 @@ public class FieldServiceTest {
 
     @Before
     public void setUp() {
-        fieldEntity = FieldEntity
+        fieldEntity = Field
                 .builder()
                 .name("Field-1")
                 .area(1.5)
@@ -52,7 +51,7 @@ public class FieldServiceTest {
                 .area(1.5)
                 .build();
 
-        userEntity = UserEntity
+        userEntity = User
                 .builder()
                 .id(1L)
                 .userName("root12")
@@ -79,7 +78,7 @@ public class FieldServiceTest {
         String userName = "user";
         when(userRepository.findByUserNameIgnoreCase(userName)).thenReturn(userEntity);
 
-        UserEntity foundUser = fieldService.findFieldOwnerByName(userName);
+        User foundUser = fieldService.findFieldOwnerByName(userName);
 
         assertEquals(userEntity, foundUser);
     }

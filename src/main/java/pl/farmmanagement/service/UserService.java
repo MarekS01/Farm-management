@@ -2,9 +2,9 @@ package pl.farmmanagement.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.farmmanagement.model.FieldEntity;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.model.User;
-import pl.farmmanagement.model.UserEntity;
 import pl.farmmanagement.model.UserRole;
 import pl.farmmanagement.repository.RoleRepository;
 import pl.farmmanagement.repository.UserRepository;
@@ -24,25 +24,25 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final SecurityConfig securityConfig;
 
-    public User add(User user) {
-        UserEntity entity = mapToUserEntity(user);
+    public UserDTO add(UserDTO user) {
+        User entity = mapToUserEntity(user);
         Set<UserRole> roles = Stream.of(roleRepository.findByRole("USER"))
                 .collect(Collectors.toSet());
         entity.setRoles(roles);
         entity.setPassword(securityConfig.passwordEncoder().encode(entity.getPassword()));
-        UserEntity savedUser = userRepository.save(entity);
+        User savedUser = userRepository.save(entity);
         return mapToUserDTO(savedUser);
     }
 
-    public List<User> findAllUsers() {
+    public List<UserDTO> findAllUsers() {
         return userRepository
                 .findAllByRoles(roleRepository.findByRole("USER"))
                 .stream().map(this::mapToUserDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<User> findByUserId(Long id){
-        Optional<UserEntity> theUser = userRepository.findById(id);
+    public Optional<UserDTO> findByUserId(Long id){
+        Optional<User> theUser = userRepository.findById(id);
         return theUser.map(this::mapToUserDTO);
     }
 
@@ -50,17 +50,17 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> findByUserNameAndPassword(String userName, String password) {
-        Optional<UserEntity> byUserNameAndPassword = userRepository.findByUserNameIgnoreCaseAndPassword(userName, password);
+    public Optional<UserDTO> findByUserNameAndPassword(String userName, String password) {
+        Optional<User> byUserNameAndPassword = userRepository.findByUserNameIgnoreCaseAndPassword(userName, password);
         return byUserNameAndPassword.map(this::mapToUserDTO);
     }
 
-    public List<FieldEntity> findAllUserFieldByUserName(String userName) {
+    public List<Field> findAllUserFieldByUserName(String userName) {
         return userRepository.userFieldsByUserName(userName);
     }
 
-    private UserEntity mapToUserEntity(User a) {
-        return UserEntity.builder()
+    private User mapToUserEntity(UserDTO a) {
+        return User.builder()
                 .id(a.getId())
                 .userName(a.getUserName())
                 .password(a.getPassword())
@@ -70,8 +70,8 @@ public class UserService {
                 .build();
     }
 
-    private User mapToUserDTO(UserEntity a) {
-        return User.builder()
+    private UserDTO mapToUserDTO(User a) {
+        return UserDTO.builder()
                 .id(a.getId())
                 .userName(a.getUserName())
                 .password(a.getPassword())

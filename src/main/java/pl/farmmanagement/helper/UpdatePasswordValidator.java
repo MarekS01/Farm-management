@@ -1,8 +1,8 @@
 package pl.farmmanagement.helper;
 
 import lombok.RequiredArgsConstructor;
-import pl.farmmanagement.model.UpdateUserDTO;
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.dto.UpdateUserDTO;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.security.SecurityConfig;
 import pl.farmmanagement.service.UserService;
 
@@ -23,7 +23,7 @@ public class UpdatePasswordValidator implements ConstraintValidator<UpdatePasswo
         if (user.getOldPassword() == null) {
             return false;
         }
-        User theUser = userService.findByUserId(user.getId())
+        UserDTO theUser = userService.findByUserId(user.getId())
                 .orElseThrow(RuntimeException::new);
         Pattern pattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
         return securityConfig.passwordEncoder().matches(user.getOldPassword(), theUser.getPassword())

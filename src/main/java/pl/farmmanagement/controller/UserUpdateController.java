@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import pl.farmmanagement.model.UpdateUserDTO;
+import pl.farmmanagement.model.dto.UpdateUserDTO;
 import pl.farmmanagement.service.UserUpdateService;
 
 import javax.servlet.http.HttpServletRequest;

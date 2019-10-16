@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.farmmanagement.model.*;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.repository.RoleRepository;
 import pl.farmmanagement.repository.UserRepository;
 
@@ -21,8 +22,8 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class UserServiceTest {
 
-    private UserEntity userEntity;
-    private User userDTO;
+    private User userEntity;
+    private UserDTO userDTO;
 
     @Autowired
     private UserService userService;
@@ -35,7 +36,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp() {
-        userEntity = UserEntity
+        userEntity = User
                 .builder()
                 .id(1L)
                 .userName("root12")
@@ -43,7 +44,7 @@ public class UserServiceTest {
                 .eMail("root@gmail.com")
                 .build();
 
-        userDTO = User
+        userDTO = UserDTO
                 .builder()
                 .id(1L)
                 .userName("root12")
@@ -54,9 +55,9 @@ public class UserServiceTest {
 
     @Test
     public void whenAddUser_thenSaveUserAndReturnsCorrectUserDetails() {
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(userRepository.save(any(User.class))).thenReturn(userEntity);
 
-        User addedUser = userService.add(userDTO);
+        UserDTO addedUser = userService.add(userDTO);
 
         assertEquals(Long.valueOf(1), addedUser.getId());
         assertEquals(userDTO.getUserName(), addedUser.getUserName());
@@ -76,7 +77,7 @@ public class UserServiceTest {
         when(userRepository.findAllByRoles(userRole))
                 .thenReturn(Arrays.asList(userEntity));
 
-        List<User> allUsers = userService.findAllUsers();
+        List<UserDTO> allUsers = userService.findAllUsers();
 
         assertEquals(1,allUsers.size());
         assertEquals(Long.valueOf(1),allUsers.get(0).getId());
@@ -86,7 +87,7 @@ public class UserServiceTest {
     public void whenFindUserByExistingUserId_theReturnsUser(){
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
-        Optional<User> foundedUser = userService.findByUserId(1L);
+        Optional<UserDTO> foundedUser = userService.findByUserId(1L);
 
         assertEquals(userDTO,foundedUser.get());
     }
@@ -95,7 +96,7 @@ public class UserServiceTest {
     public void whenFindUserByNotExistingUserId_thenNotFindUser(){
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<User> foundedUser = userService.findByUserId(1L);
+        Optional<UserDTO> foundedUser = userService.findByUserId(1L);
 
         assertFalse(foundedUser.isPresent());
     }
@@ -115,7 +116,7 @@ public class UserServiceTest {
         when(userRepository.findByUserNameIgnoreCaseAndPassword(userName, password))
                 .thenReturn(Optional.of(userEntity));
 
-        Optional<User> foundUser = userService.findByUserNameAndPassword(userName, password);
+        Optional<UserDTO> foundUser = userService.findByUserNameAndPassword(userName, password);
 
         assertTrue(foundUser.isPresent());
         assertEquals(userDTO, foundUser.get());
@@ -125,17 +126,17 @@ public class UserServiceTest {
     public void whenGetAllUserFieldsByUserName_thenReturnsAllUserFields() {
         String userName = "user";
 
-        FieldEntity field = FieldEntity
+        Field field = Field
                 .builder()
                 .name("Field-1")
                 .area(2.2)
                 .build();
 
-        List<FieldEntity> fieldsList = Arrays.asList(field);
+        List<Field> fieldsList = Arrays.asList(field);
 
         when(userRepository.userFieldsByUserName(userName))
                 .thenReturn(fieldsList);
-        List<FieldEntity> userFields = userService.findAllUserFieldByUserName(userName);
+        List<Field> userFields = userService.findAllUserFieldByUserName(userName);
 
         assertEquals(fieldsList, userFields);
     }

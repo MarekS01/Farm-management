@@ -1,11 +1,11 @@
 package pl.farmmanagement.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pl.farmmanagement.model.FieldOperationEntity;
+import pl.farmmanagement.model.FieldOperation;
 
 import java.util.List;
 
-public interface FieldOperationRepository extends JpaRepository<FieldOperationEntity, Long> {
+public interface FieldOperationRepository extends JpaRepository<FieldOperation, Long> {
 
-  List<FieldOperationEntity> findAllByFieldEntityIdOrderByOperationDate(Long id);
+  List<FieldOperation> findAllByFieldEntityIdOrderByOperationDate(Long id);
 }

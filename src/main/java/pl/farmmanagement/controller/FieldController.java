@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import pl.farmmanagement.model.FieldDTO;
+import pl.farmmanagement.model.dto.FieldDTO;
 import pl.farmmanagement.service.FieldService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class FieldController {
                             HttpServletResponse response) {
 
         if (bindingResult.hasErrors()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return "newField-form";
         } else {
             fieldService.addField(loggedUserDetails.getName(), field);

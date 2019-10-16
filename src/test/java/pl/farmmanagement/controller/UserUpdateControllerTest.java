@@ -13,8 +13,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import pl.farmmanagement.model.UpdateUserDTO;
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.dto.UpdateUserDTO;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.repository.UserRepository;
 import pl.farmmanagement.security.SecurityConfig;
 import pl.farmmanagement.security.SecurityUserDetailsService;
@@ -164,8 +164,8 @@ public class UserUpdateControllerTest {
 
         theUser.setOldPassword(correctUserUpdateOldPassword);
 
-        Optional<User> returnedUserFromDB =
-                Optional.of(User.builder()
+        Optional<UserDTO> returnedUserFromDB =
+                Optional.of(UserDTO.builder()
                 .password(securityConfig.passwordEncoder().encode(userEntityPassword))
                 .build());
 
@@ -190,8 +190,8 @@ public class UserUpdateControllerTest {
 
         theUser.setOldPassword(incorrectUserUpdateOldPassword);
 
-        Optional<User> returnedUserFromDB =
-                Optional.of(User.builder()
+        Optional<UserDTO> returnedUserFromDB =
+                Optional.of(UserDTO.builder()
                         .password(securityConfig.passwordEncoder().encode(userEntityPassword))
                         .build());
 

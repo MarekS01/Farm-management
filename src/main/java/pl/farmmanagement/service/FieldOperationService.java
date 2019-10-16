@@ -2,8 +2,8 @@ package pl.farmmanagement.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.farmmanagement.model.dto.FieldOperationDTO;
 import pl.farmmanagement.model.FieldOperation;
-import pl.farmmanagement.model.FieldOperationEntity;
 import pl.farmmanagement.repository.FieldOperationRepository;
 import pl.farmmanagement.repository.FieldRepository;
 
@@ -18,37 +18,37 @@ public class FieldOperationService {
     private final FieldOperationRepository fieldOperationRepository;
     private final FieldRepository fieldRepository;
 
-    public FieldOperation addFieldOperation(Long fieldId, FieldOperation fieldOperation) {
+    public FieldOperationDTO addFieldOperation(Long fieldId, FieldOperationDTO fieldOperation) {
         fieldRepository.findById(fieldId)
                 .ifPresent(fieldOperation::setFieldEntity);
-        FieldOperationEntity fieldOperationEntity = mapToFieldOperationEntity(fieldOperation);
+        FieldOperation fieldOperationEntity = mapToFieldOperationEntity(fieldOperation);
         fieldOperationRepository.save(fieldOperationEntity);
         return mapToFieldOperation(fieldOperationEntity);
     }
 
-    public List<FieldOperation> findAllOperationsByField(Long id) {
-        List<FieldOperationEntity> fieldOperations =
+    public List<FieldOperationDTO> findAllOperationsByField(Long id) {
+        List<FieldOperation> fieldOperations =
                 fieldOperationRepository.findAllByFieldEntityIdOrderByOperationDate(id);
         return fieldOperations.stream()
                 .map(this::mapToFieldOperation)
                 .collect(Collectors.toList());
     }
 
-    public Optional<FieldOperation> findOperationById(Long id) {
-        Optional<FieldOperationEntity> foundFieldOperation = fieldOperationRepository.findById(id);
+    public Optional<FieldOperationDTO> findOperationById(Long id) {
+        Optional<FieldOperation> foundFieldOperation = fieldOperationRepository.findById(id);
         if (foundFieldOperation.isPresent()) {
-            FieldOperation fieldOperation = mapToFieldOperation(foundFieldOperation.get());
+            FieldOperationDTO fieldOperation = mapToFieldOperation(foundFieldOperation.get());
             return Optional.of(fieldOperation);
         } else {
             return Optional.empty();
         }
     }
 
-    public Optional<FieldOperation> doneTask(Long fieldId, Long operationId) {
-        Optional<FieldOperationEntity> foundOperation = fieldOperationRepository.findById(operationId);
+    public Optional<FieldOperationDTO> doneTask(Long fieldId, Long operationId) {
+        Optional<FieldOperation> foundOperation = fieldOperationRepository.findById(operationId);
         foundOperation.ifPresent(operation -> {
             operation.setDone(true);
-            FieldOperation fieldOperation = mapToFieldOperation(operation);
+            FieldOperationDTO fieldOperation = mapToFieldOperation(operation);
             addFieldOperation(fieldId,fieldOperation);
         });
         return foundOperation.map(this::mapToFieldOperation);
@@ -58,8 +58,8 @@ public class FieldOperationService {
         fieldOperationRepository.deleteById(id);
     }
 
-    private FieldOperation mapToFieldOperation(FieldOperationEntity field) {
-        return FieldOperation.builder()
+    private FieldOperationDTO mapToFieldOperation(FieldOperation field) {
+        return FieldOperationDTO.builder()
                 .id(field.getId())
                 .task(field.getTask())
                 .operationDate(field.getOperationDate())
@@ -68,8 +68,8 @@ public class FieldOperationService {
                 .build();
     }
 
-    private FieldOperationEntity mapToFieldOperationEntity(FieldOperation field) {
-        return FieldOperationEntity.builder()
+    private FieldOperation mapToFieldOperationEntity(FieldOperationDTO field) {
+        return FieldOperation.builder()
                 .id(field.getId())
                 .task(field.getTask())
                 .operationDate(field.getOperationDate())

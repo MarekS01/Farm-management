@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.User;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -20,8 +19,8 @@ import static org.junit.Assert.*;
 public class FieldRepositoryTest {
 
     private static final double MIN_FIELD_AREA = 0.01;
-    private FieldEntity fieldEntity;
-    private UserEntity userEntity;
+    private Field fieldEntity;
+    private User userEntity;
 
     @Autowired
     private TestEntityManager testEntityManager;
@@ -31,13 +30,13 @@ public class FieldRepositoryTest {
 
     @Before
     public void setUp() {
-        userEntity = UserEntity.builder()
+        userEntity = User.builder()
                 .id(1000L)
                 .userName("user")
                 .password("password")
                 .build();
 
-        fieldEntity = FieldEntity
+        fieldEntity = Field
                 .builder()
                 .name("FIELD1")
                 .area(0.8)
@@ -53,7 +52,7 @@ public class FieldRepositoryTest {
         testEntityManager.merge(userEntity);
         testEntityManager.persistAndFlush(fieldEntity);
 
-        Optional<FieldEntity> foundField = fieldRepository
+        Optional<Field> foundField = fieldRepository
                 .findByNameIgnoreCaseAndUserName(fieldNameWithoutUpperCase,userEntity.getUserName());
 
         assertTrue(foundField.isPresent());

@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import pl.farmmanagement.model.FieldOperation;
+import pl.farmmanagement.model.dto.FieldOperationDTO;
 import pl.farmmanagement.service.FieldOperationService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class FieldOperationController {
 
         request.getSession().setAttribute("fieldId", id);
         request.getSession().setAttribute("fieldName", fieldName);
-        List<FieldOperation> allFieldOperations =
+        List<FieldOperationDTO> allFieldOperations =
                 fieldOperationService.findAllOperationsByField(id);
         model.addAttribute("operations", allFieldOperations);
         return "operations";
@@ -47,20 +47,20 @@ public class FieldOperationController {
 
     @GetMapping(value = "/new")
     public String newOperation(Model model, HttpServletRequest request) {
-        FieldOperation fieldOperation = new FieldOperation();
+        FieldOperationDTO fieldOperation = new FieldOperationDTO();
         request.getSession().setAttribute("addOrUpdateOperation", "Add");
         model.addAttribute("operation", fieldOperation);
         return "operation-form";
     }
 
     @PostMapping(value = "/new")
-    public String processForm(@ModelAttribute("operation") @Valid FieldOperation newOperation,
+    public String processForm(@ModelAttribute("operation") @Valid FieldOperationDTO newOperation,
                               BindingResult result,
                               HttpServletRequest request,
                               HttpServletResponse response) {
 
         if (result.hasErrors()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return "operation-form";
         } else {
             Long fieldId = (Long) request.getSession().getAttribute("fieldId");
@@ -73,8 +73,8 @@ public class FieldOperationController {
 
     @GetMapping("/updateOperation")
     public String updateOperations(@RequestParam("id") Long id, Model model, HttpServletRequest request) {
-        Optional<FieldOperation> theOperation = fieldOperationService.findOperationById(id);
-        FieldOperation fieldOperation = theOperation.orElseGet(FieldOperation::new);
+        Optional<FieldOperationDTO> theOperation = fieldOperationService.findOperationById(id);
+        FieldOperationDTO fieldOperation = theOperation.orElseGet(FieldOperationDTO::new);
         request.getSession().setAttribute("addOrUpdateOperation", "Update");
         model.addAttribute("operation", fieldOperation);
         return "operation-form";

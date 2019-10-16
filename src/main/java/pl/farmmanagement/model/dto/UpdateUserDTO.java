@@ -1,4 +1,4 @@
-package pl.farmmanagement.model;
+package pl.farmmanagement.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

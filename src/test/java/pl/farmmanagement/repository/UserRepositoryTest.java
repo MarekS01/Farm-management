@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.UserEntity;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.User;
 import pl.farmmanagement.model.UserRole;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 @DataJpaTest
 public class UserRepositoryTest {
 
-    private UserEntity userEntity;
+    private User userEntity;
 
     @Autowired
     private TestEntityManager testEntityManager;
@@ -32,7 +32,7 @@ public class UserRepositoryTest {
 
     @Before
     public void setUp() {
-        userEntity = UserEntity
+        userEntity = User
                 .builder()
                 .userName("root12")
                 .password("root1234")
@@ -46,7 +46,7 @@ public class UserRepositoryTest {
         String userNameWithUpperCase = "ROOT12";
         testEntityManager.persistAndFlush(userEntity);
 
-        UserEntity foundUser = userRepository.findByUserNameIgnoreCase(userNameWithUpperCase);
+        User foundUser = userRepository.findByUserNameIgnoreCase(userNameWithUpperCase);
 
         assertNotNull(foundUser);
         assertEquals(userEntity, foundUser);
@@ -60,7 +60,7 @@ public class UserRepositoryTest {
 
         testEntityManager.persistAndFlush(userEntity);
 
-        Optional<UserEntity> foundUser = userRepository
+        Optional<User> foundUser = userRepository
                 .findByUserNameIgnoreCaseAndPassword(userNameWithUpperCase, userPass);
 
         assertTrue(foundUser.isPresent());
@@ -70,23 +70,23 @@ public class UserRepositoryTest {
     @Test
     public void whenFindUserFieldsByUserName_thenShouldReturnsUserFields() {
         String userName = "root12";
-        FieldEntity field1 = FieldEntity
+        Field field1 = Field
                 .builder()
                 .name("Field-1")
                 .area(0.8)
                 .user(userEntity)
                 .build();
-        FieldEntity field2 = FieldEntity
+        Field field2 = Field
                 .builder()
                 .name("Field-2")
                 .area(3.0)
                 .user(userEntity)
                 .build();
-        List<FieldEntity> userFields = Arrays.asList(field1, field2);
+        List<Field> userFields = Arrays.asList(field1, field2);
         userEntity.setUserFields(userFields);
         testEntityManager.persistAndFlush(userEntity);
 
-        List<FieldEntity> foundUserFields = userRepository.userFieldsByUserName(userName);
+        List<Field> foundUserFields = userRepository.userFieldsByUserName(userName);
 
         assertEquals(userFields, foundUserFields);
     }
@@ -101,7 +101,7 @@ public class UserRepositoryTest {
                 .id(2L)
                 .role("ADMIN")
                 .build();
-        UserEntity userEntityWithAdminRole = UserEntity.builder()
+        User userEntityWithAdminRole = User.builder()
                 .userName("admin")
                 .password("admin")
                 .roles(Sets.newSet(adminRole))
@@ -111,7 +111,7 @@ public class UserRepositoryTest {
         testEntityManager.persistAndFlush(userEntity);
         testEntityManager.persistAndFlush(userEntityWithAdminRole);
 
-        List<UserEntity> userWithAdminRole = userRepository.findAllByRoles(userRole);
+        List<User> userWithAdminRole = userRepository.findAllByRoles(userRole);
 
         assertEquals(1,userWithAdminRole.size());
         assertEquals(userEntity,userWithAdminRole.get(0));

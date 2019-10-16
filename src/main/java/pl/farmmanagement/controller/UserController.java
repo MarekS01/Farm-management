@@ -9,8 +9,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import pl.farmmanagement.model.FieldEntity;
-import pl.farmmanagement.model.User;
+import pl.farmmanagement.model.Field;
+import pl.farmmanagement.model.dto.UserDTO;
 import pl.farmmanagement.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,17 +42,17 @@ public class UserController {
     @GetMapping(value = "/signUp")
     public ModelAndView showForm(Model model) {
         ModelAndView modelAndView = new ModelAndView("newUser-form.html");
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserDTO());
         return modelAndView;
     }
 
     @PostMapping(value = "/signUp")
     public String processForm(Principal adminDetails,
-                              @Valid @ModelAttribute("user") User user,
+                              @Valid @ModelAttribute("user") UserDTO user,
                               BindingResult result,
                               HttpServletResponse response) {
         if (result.hasErrors()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return "newUser-form";
         } else {
             userService.add(user);
@@ -66,7 +66,7 @@ public class UserController {
     public String userHomePage(Model model,
                                Principal principal,
                                HttpServletRequest request) {
-        List<FieldEntity> allUserField = userService.findAllUserFieldByUserName(principal.getName());
+        List<Field> allUserField = userService.findAllUserFieldByUserName(principal.getName());
         model.addAttribute("fields", allUserField);
         request.getSession().removeAttribute("updateMessage");
         return "userHomePage";
@@ -75,7 +75,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public ModelAndView adminPage() {
-        List<User> userList = userService.findAllUsers();
+        List<UserDTO> userList = userService.findAllUsers();
         ModelAndView modelAndView = new ModelAndView("adminPage.html");
         modelAndView.addObject("users", userList);
         return modelAndView;

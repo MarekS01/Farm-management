@@ -1,10 +1,12 @@
-package pl.farmmanagement.model;
+package pl.farmmanagement.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.farmmanagement.helper.UniqueFieldName;
+import pl.farmmanagement.model.FieldOperation;
+import pl.farmmanagement.model.User;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -27,7 +29,7 @@ public class FieldDTO {
     @Positive(message = "Must be higher that 0")
     private double area;
 
-    private List<FieldOperationEntity> operationsList;
+    private List<FieldOperation> operationsList;
 
-    private UserEntity userEntity;
+    private User userEntity;
 }

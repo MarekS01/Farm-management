@@ -4,28 +4,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FieldOperation {
 
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  @NotNull(message = "Required")
-  private LocalDate operationDate;
+    @Column(nullable = false)
+    private LocalDate operationDate;
 
-  @NotNull(message = "Required")
-  @Size(min = 1, message = "Required")
-  private String task;
+    @Column(nullable = false)
+    private String task;
 
-  private boolean isDone;
-  private FieldEntity fieldEntity;
+    private boolean isDone;
+
+    @ManyToOne
+    @JoinColumn(name = "field_id")
+    private Field fieldEntity;
 }
